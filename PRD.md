@@ -1077,32 +1077,39 @@ As sprints estão em ordem lógica de dependência: fundação → autenticaçã
 
 ### Sprint 0 — Fundação do projeto e ambiente local
 
-- [ ] Instalar Python 3.13 e confirmar a versão com `python3.13 --version`
-- [ ] Criar o repositório no GitHub e inicializar o Git local
-- [ ] Criar o ambiente virtual `.venv` na raiz do projeto
-- [ ] Criar o `.gitignore` incluindo `.venv/`, `.env`, `media/`, `__pycache__/`, `*.sqlite3` e `staticfiles/`
-- [ ] Instalar Django > 6.0 e criar o projeto com o pacote `core`
-- [ ] Criar o `requirements.txt` na raiz e registrar as dependências iniciais
-- [ ] Instalar PostgreSQL nativamente e iniciar o serviço
-- [ ] Criar o banco `scsi` e o usuário de aplicação no PostgreSQL
-- [ ] Instalar Redis nativamente e iniciar o serviço
+- [x] Instalar Python 3.13 e confirmar a versão com `python3.13 --version`
+- [x] Criar o repositório no GitHub e inicializar o Git local
+- [x] Criar o ambiente virtual `.venv` na raiz do projeto
+- [x] Criar o `.gitignore` incluindo `.venv/`, `.env`, `media/`, `__pycache__/`, `*.sqlite3` e `staticfiles/`
+- [x] Instalar Django > 6.0 e criar o projeto com o pacote `core`
+- [x] Criar o `requirements.txt` na raiz e registrar as dependências iniciais
+- [x] Instalar PostgreSQL nativamente e iniciar o serviço
+- [x] Criar o banco `scsi` e o usuário de aplicação no PostgreSQL
+- [x] Instalar Redis nativamente e iniciar o serviço
 - [ ] Instalar RabbitMQ nativamente, iniciar o serviço e criar o vhost do projeto
-- [ ] Instalar `django-environ` e criar o `.env` e o `.env.example` na raiz
-- [ ] Configurar o `settings.py` único lendo todas as variáveis do `.env`
-- [ ] Configurar o PostgreSQL como banco padrão via `DATABASE_URL`
-- [ ] Configurar `TIME_ZONE = 'America/Sao_Paulo'`, `LANGUAGE_CODE = 'pt-br'` e `USE_TZ = True`
-- [ ] Configurar o Redis como backend de cache da aplicação
-- [ ] Criar o app `base` na raiz e registrá-lo em `INSTALLED_APPS`
-- [ ] Implementar `TimeStampedModel` com `created_at` e `updated_at` em `base/models.py`
-- [ ] Implementar o management command `wait_for_db` com tentativas e timeout configuráveis
-- [ ] Implementar o management command `check_services` verificando PostgreSQL, Redis e RabbitMQ
-- [ ] Implementar o endpoint `GET /health/` retornando 200, sem acessar o banco e sem autenticação
-- [ ] Configurar `core/celery.py` com RabbitMQ como broker e Redis como result backend
+- [x] Instalar `django-environ` e criar o `.env` e o `.env.example` na raiz
+- [x] Configurar o `settings.py` único lendo todas as variáveis do `.env`
+- [x] Configurar o PostgreSQL como banco padrão via `DATABASE_URL`
+- [x] Configurar `TIME_ZONE = 'America/Sao_Paulo'`, `LANGUAGE_CODE = 'pt-br'` e `USE_TZ = True`
+- [x] Configurar o Redis como backend de cache da aplicação
+- [x] Criar o app `base` na raiz e registrá-lo em `INSTALLED_APPS`
+- [x] Implementar `TimeStampedModel` com `created_at` e `updated_at` em `base/models.py`
+- [x] Implementar o management command `wait_for_db` com tentativas e timeout configuráveis
+- [x] Implementar o management command `check_services` verificando PostgreSQL, Redis e RabbitMQ
+- [x] Implementar o endpoint `GET /health/` retornando 200, sem acessar o banco e sem autenticação
+- [x] Configurar `core/celery.py` com RabbitMQ como broker e Redis como result backend
 - [ ] Validar `celery -A core worker` e `celery -A core beat` com uma task de teste
-- [ ] Instalar e registrar o `dj-celery-panel` no admin do Django
-- [ ] Criar a pasta `docs/`, o `mkdocs.yml` com tema Material e o suporte a Mermaid
-- [ ] Criar o `README.md` inicial com o passo a passo do setup local nativo
-- [ ] Fazer o primeiro commit e o push para o GitHub
+- [x] Instalar e registrar o `dj-celery-panel` no admin do Django
+- [x] Criar a pasta `docs/`, o `mkdocs.yml` com tema Material e o suporte a Mermaid
+- [x] Criar o `README.md` inicial com o passo a passo do setup local nativo
+- [x] Fazer o primeiro commit e o push para o GitHub
+
+> **Nota de ambiente (2026-08-13).** Este ambiente roda macOS 12.7.6, que o Homebrew não
+> suporta mais (sem bottles; toda fórmula compila do source, e o RabbitMQ depende de
+> `erlang@28`). Conforme §13.1, PostgreSQL 16 e Redis 7.4 foram instalados nativamente
+> (Postgres.app e build do source, respectivamente) e o RabbitMQ ficará em serviço
+> gerenciado free tier. As duas tarefas acima seguem abertas até a `CELERY_BROKER_URL`
+> ser configurada.
 
 ### Sprint 1 — Núcleo multi-tenant
 

@@ -1,0 +1,37 @@
+# Ambiente virtual
+.venv/
+
+# Segredos
+.env
+
+# Arquivos enviados pelos usuarios (servidos apenas por view protegida)
+media/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.Python
+
+# Banco de dados local
+*.sqlite3
+
+# Arquivos estaticos coletados e CSS compilado
+staticfiles/
+static/css/app.css
+
+# Binarios de ferramentas locais
+tailwindcss
+services/
+
+# Documentacao gerada
+site/
+
+# Logs
+*.log
+celerybeat-schedule*
+
+# Sistema operacional e editores
+.DS_Store
+.idea/
+.vscode/

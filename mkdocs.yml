@@ -1,0 +1,51 @@
+site_name: SCSI — Documentação
+site_description: Sistema de Gestão para Corretora de Seguros Inteligente
+docs_dir: docs
+use_directory_urls: true
+
+theme:
+  name: material
+  language: pt-BR
+  palette:
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Alternar para tema escuro
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Alternar para tema claro
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Início: index.md
+  - Setup:
+      - Ambiente local: setup/ambiente-local.md
+  - Arquitetura:
+      - Multi-tenant: arquitetura/multi-tenant.md
+  - Modelagem: modelagem/index.md
+  - Apps: apps/index.md
+  - IA: ia/index.md
+  - Design System: design-system/index.md
