@@ -89,7 +89,7 @@ Corretoras de seguros de pequeno e médio porte operam hoje com planilhas, e-mai
 ### 2.1 No escopo
 
 - Aplicação Django multi-tenant (shared schema) rodando localmente via `runserver`.
-- PostgreSQL, Redis e RabbitMQ instalados nativamente no sistema operacional.
+- PostgreSQL e Redis instalados nativamente no sistema operacional.
 - Celery worker e beat executados localmente em terminais separados.
 - Agentes de IA com LangChain e LangGraph via API da OpenAI.
 - Interface web responsiva server-rendered, aderente ao design system.
@@ -153,8 +153,8 @@ Regras da hierarquia:
 | Linguagem | Python | > 3.13 | Padrão obrigatório do projeto |
 | Framework web | Django | > 6.0 | Class Based Views, ORM, admin, auth e e-mail nativos |
 | Banco de dados | PostgreSQL | 16+ | Obrigatório; suporte a índices compostos e JSONB |
-| Cache | Redis | 7+ | Cache da aplicação e result backend do Celery |
-| Broker de mensagens | RabbitMQ | 3.13+ | Broker obrigatório do Celery |
+| Cache | Redis | 7+ | Cache da aplicação, broker e result backend do Celery |
+| Broker de mensagens | Redis | 7+ | Broker do Celery, em database dedicado |
 | Fila assíncrona | Celery | 5.4+ | Tarefas pesadas, especialmente IA |
 | Agendamento | Celery Beat | 5.4+ | Rotinas periódicas (renovações, alertas) |
 | Observabilidade de tasks | `dj-celery-panel` | última | Visualização das tasks no admin do Django |
@@ -190,6 +190,8 @@ Regras da hierarquia:
 ### 4.4 Dependências principais (`requirements.txt`)
 
 O arquivo `requirements.txt` fica **na raiz** e deve ser atualizado a cada nova dependência instalada.
+
+> `kombu` é a camada de transporte do próprio Celery — é ela que implementa `kombu.transport.redis`. Ela puxa `amqp` como dependência transitiva mesmo sem RabbitMQ no projeto; nenhum dos dois deve ser removido.
 
 ```
 Django>=6.0
@@ -639,7 +641,7 @@ Toda tarefa pesada — em especial as de IA, geração de PDF volumoso e recálc
 
 ### RNF06 — Inicialização ordenada do ambiente
 
-Management command `wait_for_db` que aguarda o PostgreSQL responder antes de subir a aplicação, com tentativas e timeout configuráveis, evitando falhas silenciosas por dependência indisponível. Comandos análogos de verificação para Redis e RabbitMQ (`check_services`) reportam o estado de cada serviço.
+Management command `wait_for_db` que aguarda o PostgreSQL responder antes de subir a aplicação, com tentativas e timeout configuráveis, evitando falhas silenciosas por dependência indisponível. Um comando análogo (`check_services`) reporta o estado do PostgreSQL, do Redis de cache e do broker do Celery.
 
 ### RNF07 — Gestão de segredos
 
@@ -814,15 +816,14 @@ O mesmo mecanismo cobre logos de tenant, avatares de usuário e arquivos gerados
 
 ### 13.1 Princípio
 
-Todo o ambiente roda **nativamente no sistema operacional**, sem containers. PostgreSQL, Redis e RabbitMQ são instalados diretamente na máquina; a aplicação Django roda dentro do `.venv` via `runserver`. Caso a instalação nativa de algum serviço não seja viável na máquina do desenvolvedor, a **única** alternativa aceitável é um serviço gerenciado em nuvem no free tier, configurado por `.env`.
+Todo o ambiente roda **nativamente no sistema operacional**, sem containers. PostgreSQL e Redis são instalados diretamente na máquina; a aplicação Django roda dentro do `.venv` via `runserver`. Caso a instalação nativa de algum serviço não seja viável na máquina do desenvolvedor, a **única** alternativa aceitável é um serviço gerenciado em nuvem no free tier, configurado por `.env`.
 
 ### 13.2 Serviços locais
 
 | Serviço | Papel | Porta padrão | Instalação (macOS / Homebrew) | Alternativa gerenciada (free tier) |
 | --- | --- | --- | --- | --- |
 | PostgreSQL 16 | Banco de dados | 5432 | `brew install postgresql@16` + `brew services start postgresql@16` | Neon / Supabase |
-| Redis 7 | Cache + result backend do Celery | 6379 | `brew install redis` + `brew services start redis` | Upstash |
-| RabbitMQ | Broker do Celery | 5672 (painel 15672) | `brew install rabbitmq` + `brew services start rabbitmq` | CloudAMQP |
+| Redis 7 | Cache, broker e result backend do Celery | 6379 | `brew install redis` + `brew services start redis` | Upstash |
 | Django | Aplicação web | 8000 | `python manage.py runserver` no `.venv` | — |
 | Celery worker | Processamento assíncrono | — | `celery -A core worker -l info` | — |
 | Celery beat | Agendamento | — | `celery -A core beat -l info` | — |
@@ -834,7 +835,7 @@ Em Linux, os mesmos serviços são instalados pelo gerenciador de pacotes da dis
 
 ```mermaid
 graph LR
-    A[Iniciar PostgreSQL, Redis e RabbitMQ] --> B[Ativar .venv]
+    A[Iniciar PostgreSQL e Redis] --> B[Ativar .venv]
     B --> C[python manage.py wait_for_db]
     C --> D[python manage.py migrate]
     D --> E[python manage.py runserver]
@@ -889,9 +890,9 @@ O `settings.py` é **único** e lê todas as configurações do `.env` via `djan
 | `DEBUG` | Modo debug | `True` |
 | `ALLOWED_HOSTS` | Hosts permitidos | `localhost,127.0.0.1` |
 | `DATABASE_URL` | Conexão PostgreSQL | `postgres://scsi:senha@localhost:5432/scsi` |
-| `CELERY_BROKER_URL` | Broker RabbitMQ | `amqp://scsi:senha@localhost:5672/scsi` |
-| `CELERY_RESULT_BACKEND` | Result backend Redis | `redis://localhost:6379/1` |
-| `REDIS_CACHE_URL` | Cache da aplicação | `redis://localhost:6379/2` |
+| `CELERY_BROKER_URL` | Broker Redis (database dedicado) | `redis://127.0.0.1:6379/0` |
+| `CELERY_RESULT_BACKEND` | Result backend Redis | `redis://127.0.0.1:6379/1` |
+| `REDIS_CACHE_URL` | Cache da aplicação | `redis://127.0.0.1:6379/2` |
 | `TIME_ZONE` | Fuso horário | `America/Sao_Paulo` |
 | `LANGUAGE_CODE` | Idioma da interface | `pt-br` |
 | `EMAIL_HOST` | Servidor SMTP | `smtp.gmail.com` |
@@ -1086,7 +1087,7 @@ As sprints estão em ordem lógica de dependência: fundação → autenticaçã
 - [x] Instalar PostgreSQL nativamente e iniciar o serviço
 - [x] Criar o banco `scsi` e o usuário de aplicação no PostgreSQL
 - [x] Instalar Redis nativamente e iniciar o serviço
-- [ ] Instalar RabbitMQ nativamente, iniciar o serviço e criar o vhost do projeto
+- [x] Configurar o Redis como broker do Celery em database dedicado
 - [x] Instalar `django-environ` e criar o `.env` e o `.env.example` na raiz
 - [x] Configurar o `settings.py` único lendo todas as variáveis do `.env`
 - [x] Configurar o PostgreSQL como banco padrão via `DATABASE_URL`
@@ -1095,21 +1096,25 @@ As sprints estão em ordem lógica de dependência: fundação → autenticaçã
 - [x] Criar o app `base` na raiz e registrá-lo em `INSTALLED_APPS`
 - [x] Implementar `TimeStampedModel` com `created_at` e `updated_at` em `base/models.py`
 - [x] Implementar o management command `wait_for_db` com tentativas e timeout configuráveis
-- [x] Implementar o management command `check_services` verificando PostgreSQL, Redis e RabbitMQ
+- [x] Implementar o management command `check_services` verificando PostgreSQL, Redis e o broker do Celery
 - [x] Implementar o endpoint `GET /health/` retornando 200, sem acessar o banco e sem autenticação
-- [x] Configurar `core/celery.py` com RabbitMQ como broker e Redis como result backend
-- [ ] Validar `celery -A core worker` e `celery -A core beat` com uma task de teste
+- [x] Configurar `core/celery.py` com Redis como broker e result backend, em databases distintos
+- [x] Validar `celery -A core worker` e `celery -A core beat` com uma task de teste
 - [x] Instalar e registrar o `dj-celery-panel` no admin do Django
 - [x] Criar a pasta `docs/`, o `mkdocs.yml` com tema Material e o suporte a Mermaid
 - [x] Criar o `README.md` inicial com o passo a passo do setup local nativo
 - [x] Fazer o primeiro commit e o push para o GitHub
 
 > **Nota de ambiente (2026-08-13).** Este ambiente roda macOS 12.7.6, que o Homebrew não
-> suporta mais (sem bottles; toda fórmula compila do source, e o RabbitMQ depende de
-> `erlang@28`). Conforme §13.1, PostgreSQL 16 e Redis 7.4 foram instalados nativamente
-> (Postgres.app e build do source, respectivamente) e o RabbitMQ ficará em serviço
-> gerenciado free tier. As duas tarefas acima seguem abertas até a `CELERY_BROKER_URL`
-> ser configurada.
+> suporta mais (sem bottles; toda fórmula compila do source). Conforme §13.1, PostgreSQL 16
+> e Redis 7.4 foram instalados nativamente — Postgres.app e build do source,
+> respectivamente.
+
+> **Nota de decisão (2026-08-16).** O RabbitMQ foi **removido do escopo do projeto**. O
+> Redis passa a ser o broker único do Celery, acumulando os papéis de broker, result
+> backend e cache da aplicação, em databases distintos para evitar colisão de dados:
+> `0` broker, `1` result backend, `2` cache. As duas tarefas antes bloqueadas pelo
+> RabbitMQ foram concluídas com essa configuração.
 
 ### Sprint 1 — Núcleo multi-tenant
 
@@ -1445,7 +1450,7 @@ Uma tarefa só é considerada concluída quando:
 | 17 | PostgreSQL | §4.1, §13.2 |
 | 18 | Ambiente local nativo, sem containers | §13 (inteira) |
 | 19 | Celery para tarefas pesadas | §4.1, §9/RNF04, §13.4 |
-| 20 | RabbitMQ broker + Redis backend e cache | §4.1, §13.2, §14 |
+| 20 | Redis como broker, result backend e cache | §4.1, §13.2, §14 |
 | 21 | `dj-celery-panel` no admin | §4.1, RF14, Sprint 0, Sprint 14 |
 | 22 | Class Based Views e recursos nativos | §16, todas as sprints de feature |
 | 23 | Signals em `signals.py` | §15, §16, §19 |

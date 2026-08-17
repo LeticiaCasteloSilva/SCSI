@@ -14,4 +14,4 @@ Cada domínio do sistema é isolado em seu próprio app, criado na raiz do proje
 | Comando | Função |
 | --- | --- |
 | `wait_for_db` | Aguarda o PostgreSQL aceitar conexões, com `--timeout` e `--interval` |
-| `check_services` | Reporta o estado de PostgreSQL, Redis e RabbitMQ; `--fail-fast` encerra com código 1 |
+| `check_services` | Reporta o estado de PostgreSQL, Redis e do broker do Celery; `--fail-fast` encerra com código 1 |

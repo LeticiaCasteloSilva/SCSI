@@ -2,6 +2,20 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Git: nunca commitar por conta própria
+
+**Nunca execute `git add` nem `git commit`.** Quem decide e executa o commit é a pessoa usuária — sem exceção, e mesmo que o checklist de uma sprint no `PRD.md` traga "fazer o commit" como tarefa. Nesse caso a tarefa é entregar a recomendação, não executá-la; deixe o checkbox aberto para ela marcar depois de commitar.
+
+Ao final de cada sprint — ou de qualquer conjunto significativo de tarefas — **apenas recomende**, com estas três partes:
+
+1. **Quais arquivos** deveriam entrar no commit (e quais deliberadamente ficam de fora, quando relevante)
+2. **O comando git** a ser executado
+3. **Uma mensagem de commit** em [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `refactor:`, `chore:`)
+
+Entregue como um bloco de código pronto para copiar e colar.
+
+Comandos git de **leitura** (`git status`, `git diff`, `git log`, `git show`) seguem liberados e são a forma correta de levantar o que mudou antes de recomendar. O que está vedado é qualquer comando que altere o índice, o histórico ou o remoto: `add`, `commit`, `push`, `rm --cached`, `restore`, `checkout`, `reset`, `stash`, `merge`, `rebase`, `tag`. Se algum desses for necessário, recomende-o em vez de rodá-lo.
+
 ## Estado atual
 
 Repositório **greenfield**: existe apenas o `PRD.md` e a pasta `design_system/`. Nenhum código Django foi escrito ainda.
@@ -30,7 +44,7 @@ pip install -r requirements.txt
 pip freeze > requirements.txt          # após instalar qualquer dependência
 
 python manage.py wait_for_db           # aguarda o Postgres antes de subir
-python manage.py check_services        # verifica Postgres, Redis e RabbitMQ
+python manage.py check_services        # verifica Postgres, Redis e o broker do Celery
 python manage.py migrate
 python manage.py seed_demo_data        # dados fake; --tenants --months --reset
 python manage.py runserver
@@ -42,7 +56,9 @@ celery -A core beat -l info            # terminal separado
 mkdocs serve -a 127.0.0.1:8001
 ```
 
-Serviços rodam **nativos** (Homebrew no macOS): `brew services start postgresql@16 redis rabbitmq`.
+Serviços rodam **nativos** (Homebrew no macOS): `brew services start postgresql@16 redis`.
+
+**Redis acumula três papéis** em databases distintos: `0` broker do Celery, `1` result backend, `2` cache da aplicação. Não há RabbitMQ no projeto — foi removido do escopo (PRD §18, nota de decisão).
 
 **Não há testes automatizados neste projeto** — é uma decisão explícita, não uma lacuna. Não escreva testes nem sugira escrevê-los. Verificação é manual, com `seed_demo_data` como base.
 
@@ -100,7 +116,7 @@ Toda tool recebe `tenant_id` e `user_id` no estado do grafo e **filtra obrigator
 
 Esta fase é **desenvolvimento local nativo + GitHub**. Não gere, sugira ou planeje: conteinerização, orquestração, proxies reversos, gestão de DNS, certificados, provisionamento de servidor remoto, deploy em produção, registries de imagem ou scripts de backup de infraestrutura produtiva.
 
-Se a instalação nativa de Postgres/Redis/RabbitMQ não for viável, a **única** alternativa aceitável é serviço gerenciado em nuvem no free tier, configurado por `.env`.
+Se a instalação nativa de Postgres/Redis não for viável, a **única** alternativa aceitável é serviço gerenciado em nuvem no free tier, configurado por `.env`.
 
 Também fora de escopo: testes automatizados, cobrança e planos pagos (só o plano Free é habilitado; os demais mostram "Em breve" desabilitado, sem pedir cartão).
 

@@ -13,8 +13,8 @@ Sprint 0 — Fundação do projeto e ambiente local.
 | Python 3.13 + `.venv` | Pronto |
 | Django 6.1 com `settings.py` único | Pronto |
 | PostgreSQL 16 nativo | Pronto |
-| Redis 7.4 nativo | Pronto |
-| RabbitMQ (broker do Celery) | Pendente de configuração |
+| Redis 7.4 nativo (cache, broker e result backend) | Pronto |
+| Celery (worker + beat) com broker Redis | Pronto |
 | Endpoint `GET /health/` | Pronto |
 | Commands `wait_for_db` e `check_services` | Pronto |
 

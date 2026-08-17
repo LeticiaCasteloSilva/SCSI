@@ -7,13 +7,19 @@ Todo o ambiente roda **nativamente**, sem containers. O projeto Django executa d
 | Serviço | Papel | Porta | Estado neste ambiente |
 | --- | --- | --- | --- |
 | PostgreSQL 16 | Banco de dados | 5432 | Nativo — Postgres.app |
-| Redis 7.4 | Cache + result backend do Celery | 6379 | Nativo — compilado do source |
-| RabbitMQ | Broker do Celery | 5672 | Gerenciado — CloudAMQP free tier |
+| Redis 7.4 | Cache, broker e result backend do Celery | 6379 | Nativo — compilado do source |
 
-!!! note "Por que RabbitMQ é gerenciado"
-    Este ambiente roda **macOS 12.7.6 (Monterey)**, que o Homebrew não suporta mais: não há bottles pré-compiladas, então toda fórmula compila do source. O RabbitMQ depende de `erlang@28`, cujo build do source leva horas e falha com frequência na toolchain disponível (CLT 14.2, sem Xcode).
+!!! note "Redis acumula três papéis"
+    O RabbitMQ foi removido do escopo do projeto. O Celery usa **Redis como broker e como result backend**, em databases distintos para que mensagens enfileiradas e resultados nunca compartilhem keyspace:
 
-    O PRD §13.1 prevê exatamente esse caso: quando a instalação nativa não é viável, a única alternativa aceitável é um **serviço gerenciado em nuvem no free tier**, configurado via `.env`. PostgreSQL e Redis continuam nativos.
+    | Database | Papel | Variável |
+    | --- | --- | --- |
+    | `0` | Broker do Celery | `CELERY_BROKER_URL` |
+    | `1` | Result backend | `CELERY_RESULT_BACKEND` |
+    | `2` | Cache da aplicação | `REDIS_CACHE_URL` |
+
+!!! note "Por que o Homebrew não é usado aqui"
+    Este ambiente roda **macOS 12.7.6 (Monterey)**, que o Homebrew não suporta mais: não há bottles pré-compiladas, então toda fórmula compila do source. Por isso o PostgreSQL vem do Postgres.app e o Redis é compilado — um build curto, sem dependências externas.
 
 ## Instalação dos serviços
 
@@ -84,12 +90,6 @@ mkdir -p ~/.local/var/redis
 
 Para parar: `~/.local/bin/redis-cli shutdown`.
 
-### RabbitMQ — CloudAMQP
-
-1. Crie uma conta gratuita em [cloudamqp.com](https://www.cloudamqp.com/) e uma instância no plano **Little Lemur** (free).
-2. Copie a **AMQP URL** do painel da instância.
-3. Preencha `CELERY_BROKER_URL` no `.env`.
-
 ## Projeto Django
 
 ```bash
@@ -104,7 +104,7 @@ Ordem de inicialização:
 
 ```mermaid
 graph LR
-    A[PostgreSQL, Redis e RabbitMQ no ar] --> B[source .venv/bin/activate]
+    A[PostgreSQL e Redis no ar] --> B[source .venv/bin/activate]
     B --> C[manage.py wait_for_db]
     C --> D[manage.py migrate]
     D --> E[manage.py runserver]
@@ -131,7 +131,7 @@ celery -A core beat -l info
 
 ```bash
 curl -i http://127.0.0.1:8000/health/     # 200 {"status": "ok"}
-python manage.py check_services            # PostgreSQL / Redis / RabbitMQ
+python manage.py check_services            # PostgreSQL / Redis / broker do Celery
 ```
 
 O `check_services` imprime o estado de cada dependência e nunca vaza credenciais — as URLs são exibidas sem usuário e senha.

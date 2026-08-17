@@ -151,7 +151,8 @@ DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='nao-responda@scsi.local'
 if DEBUG and not EMAIL_HOST:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Celery: RabbitMQ is the broker, Redis is the result backend
+# Celery: Redis is both the broker and the result backend, on separate
+# databases so queued messages and stored results never share keyspace.
 
 CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='')
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')

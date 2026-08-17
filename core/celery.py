@@ -6,7 +6,8 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 
 app = Celery('core')
 
-# RabbitMQ is the broker and Redis is the result backend; both come from the
+# Redis is both the broker and the result backend, on separate databases so
+# queued messages and stored results never share keyspace. Both come from the
 # CELERY_* keys of the single settings module, which reads them from `.env`.
 app.config_from_object('django.conf:settings', namespace='CELERY')
 

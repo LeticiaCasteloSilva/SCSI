@@ -13,8 +13,7 @@ Gestão completa da operação — clientes, seguradoras, ramos, itens cobertos,
 | Linguagem | Python 3.13 |
 | Framework | Django 6.1 |
 | Banco de dados | PostgreSQL 16 |
-| Cache e result backend | Redis 7.4 |
-| Broker de mensagens | RabbitMQ |
+| Cache, broker e result backend | Redis 7.4 |
 | Fila assíncrona | Celery 5.6 (worker + beat) |
 | IA | LangChain > 1.0 + LangGraph |
 | Documentação | MkDocs Material com Mermaid |
@@ -25,29 +24,28 @@ Todo o ambiente roda **nativamente**, sem containers.
 
 - macOS ou Linux
 - Python 3.13 ou superior
-- PostgreSQL 16, Redis 7 e RabbitMQ
+- PostgreSQL 16 e Redis 7
 
 ## 1. Serviços
 
 ### Linux
 
 ```bash
-sudo apt install postgresql-16 redis-server rabbitmq-server
-sudo systemctl enable --now postgresql redis-server rabbitmq-server
+sudo apt install postgresql-16 redis-server
+sudo systemctl enable --now postgresql redis-server
 ```
 
 ### macOS com Homebrew
 
 ```bash
-brew install postgresql@16 redis rabbitmq
+brew install postgresql@16 redis
 brew services start postgresql@16
 brew services start redis
-brew services start rabbitmq
 ```
 
 ### macOS 12 (Monterey) e anteriores
 
-O Homebrew não suporta mais essas versões — não há bottles pré-compiladas e toda fórmula compila do source. O caminho testado neste projeto usa **Postgres.app** e **Redis compilado**, com o RabbitMQ em serviço gerenciado. O passo a passo completo está em [`docs/setup/ambiente-local.md`](docs/setup/ambiente-local.md).
+O Homebrew não suporta mais essas versões — não há bottles pré-compiladas e toda fórmula compila do source. O caminho testado neste projeto usa **Postgres.app** e **Redis compilado do source**. O passo a passo completo está em [`docs/setup/ambiente-local.md`](docs/setup/ambiente-local.md).
 
 ### Banco e usuário
 
@@ -57,16 +55,6 @@ CREATE ROLE scsi WITH LOGIN PASSWORD 'sua-senha-aqui' CREATEDB;
 CREATE DATABASE scsi OWNER scsi ENCODING 'UTF8';
 SQL
 ```
-
-### Vhost do RabbitMQ
-
-```bash
-sudo rabbitmqctl add_user scsi sua-senha-aqui
-sudo rabbitmqctl add_vhost scsi
-sudo rabbitmqctl set_permissions -p scsi scsi '.*' '.*' '.*'
-```
-
-Se a instalação nativa do RabbitMQ não for viável, use um serviço gerenciado no free tier (CloudAMQP) e aponte `CELERY_BROKER_URL` para a URL fornecida.
 
 ## 2. Projeto
 
@@ -97,7 +85,7 @@ python -c "from django.core.management.utils import get_random_secret_key as k; 
 | `DEBUG` | `True` em desenvolvimento |
 | `ALLOWED_HOSTS` | Hosts permitidos, separados por vírgula |
 | `DATABASE_URL` | `postgres://scsi:senha@127.0.0.1:5432/scsi` |
-| `CELERY_BROKER_URL` | `amqp://scsi:senha@localhost:5672/scsi` |
+| `CELERY_BROKER_URL` | `redis://127.0.0.1:6379/0` |
 | `CELERY_RESULT_BACKEND` | `redis://127.0.0.1:6379/1` |
 | `REDIS_CACHE_URL` | `redis://127.0.0.1:6379/2` |
 | `TIME_ZONE` | `America/Sao_Paulo` |

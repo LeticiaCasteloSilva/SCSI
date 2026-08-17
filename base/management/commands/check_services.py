@@ -8,7 +8,7 @@ from django.db import connections
 class Command(BaseCommand):
     """Report the availability of every external service the project depends on."""
 
-    help = 'Verifica a disponibilidade de PostgreSQL, Redis e RabbitMQ.'
+    help = 'Verifica a disponibilidade de PostgreSQL, Redis (cache) e do broker do Celery.'
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -21,7 +21,7 @@ class Command(BaseCommand):
         results = [
             self.check_postgres(),
             self.check_redis(),
-            self.check_rabbitmq(),
+            self.check_broker(),
         ]
 
         self.stdout.write('')
@@ -64,18 +64,19 @@ class Command(BaseCommand):
         except Exception as error:
             return 'Redis', False, str(error).strip().splitlines()[0]
 
-    def check_rabbitmq(self):
+    def check_broker(self):
+        """Check the Celery broker, which runs on Redis on its own database."""
         url = settings.CELERY_BROKER_URL
         if not url:
-            return 'RabbitMQ', False, 'CELERY_BROKER_URL nao configurada no .env'
+            return 'Broker', False, 'CELERY_BROKER_URL nao configurada no .env'
         try:
             from kombu import Connection
 
             with Connection(url, connect_timeout=5) as connection:
                 connection.connect()
-            return 'RabbitMQ', True, f'broker conectado em {self.safe(url)}'
+            return 'Broker', True, f'Celery conectado em {self.safe(url)}'
         except Exception as error:
-            return 'RabbitMQ', False, str(error).strip().splitlines()[0]
+            return 'Broker', False, str(error).strip().splitlines()[0]
 
     @staticmethod
     def safe(url):
