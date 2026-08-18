@@ -11,4 +11,13 @@ Sprint 0 entregou apenas o model abstrato `base.models.TimeStampedModel`, que fo
 | `created_at` | `DateTimeField` | `auto_now_add`, indexado |
 | `updated_at` | `DateTimeField` | `auto_now` |
 
-As entidades de domínio começam na Sprint 1 (`core.Tenant`, `core.Plan`) e seguem pelas sprints seguintes.
+A Sprint 1 acrescentou o abstrato `base.models.TenantAwareModel`, que herda esses campos e injeta a FK `tenant`, e os dois primeiros models concretos:
+
+| Model | App | Papel |
+| --- | --- | --- |
+| `Plan` | `core` | Catálogo de planos; só o Free tem `is_enabled=True` |
+| `Tenant` | `core` | A corretora — raiz do isolamento, com Razão Social e CNPJ validado |
+
+Nenhum dos dois é tenant-aware: `Plan` é catálogo global e `Tenant` é a própria raiz.
+
+As demais entidades de domínio seguem pelas sprints seguintes, todas herdando de `TenantAwareModel`.

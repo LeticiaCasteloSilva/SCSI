@@ -9,6 +9,18 @@ Cada domínio do sistema é isolado em seu próprio app, criado na raiz do proje
 | `core` | Pacote do projeto (`settings.py` único, `urls.py`, `celery.py`) e app principal: landing page, `/health/`, e futuramente `Tenant` e `Plan` |
 | `base` | Recursos compartilhados: models abstratos, managers, middlewares, mixins, view de media protegida e management commands |
 
+## Módulos do app `base`
+
+| Módulo | Conteúdo |
+| --- | --- |
+| `constants.py` | `Role` — papéis `OWNER`, `AGENT`, `PRODUCER` |
+| `context.py` | ContextVar do tenant corrente e `tenant_context` |
+| `managers.py` | `TenantQuerySet` e `TenantManager` |
+| `middleware.py` | `TenantMiddleware` |
+| `mixins.py` | `TenantRequiredMixin`, `RolePermissionMixin` |
+| `models.py` | `TimeStampedModel`, `TenantAwareModel` |
+| `validators.py` | `validate_cnpj`, `format_cnpj` |
+
 ## Comandos do app `base`
 
 | Comando | Função |

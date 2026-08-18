@@ -66,6 +66,9 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # Must run after AuthenticationMiddleware: it resolves the tenant from
+    # request.user and publishes it for TenantManager to read.
+    'base.middleware.TenantMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

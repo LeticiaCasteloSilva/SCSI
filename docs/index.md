@@ -6,7 +6,7 @@ A especificação completa do produto está no [`PRD.md`](https://github.com/Let
 
 ## Estado atual
 
-Sprint 0 — Fundação do projeto e ambiente local.
+Sprints 0 e 1 — fundação do ambiente local e núcleo multi-tenant.
 
 | Componente | Estado |
 | --- | --- |
@@ -17,6 +17,7 @@ Sprint 0 — Fundação do projeto e ambiente local.
 | Celery (worker + beat) com broker Redis | Pronto |
 | Endpoint `GET /health/` | Pronto |
 | Commands `wait_for_db` e `check_services` | Pronto |
+| Núcleo multi-tenant (`Tenant`, `Plan`, managers, middleware, mixins) | Pronto |
 
 ## Por onde começar
 

@@ -1118,20 +1118,34 @@ As sprints estão em ordem lógica de dependência: fundação → autenticaçã
 
 ### Sprint 1 — Núcleo multi-tenant
 
-- [ ] Criar o app `core` como app principal registrado em `INSTALLED_APPS`
-- [ ] Modelar `Plan` com `is_enabled` (habilitado apenas no Free)
-- [ ] Modelar `Tenant` com Razão Social e CNPJ obrigatórios e validados
-- [ ] Criar a migração inicial e o data migration que popula os planos Free, Pro e Business
-- [ ] Implementar o `ContextVar` de tenant corrente em `base/context.py`
-- [ ] Implementar `TenantQuerySet` e `TenantManager` com filtro automático por tenant
-- [ ] Implementar o model abstrato `TenantAwareModel` com FK `tenant` e auditoria
-- [ ] Implementar `TenantMiddleware` resolvendo o tenant a partir do usuário autenticado
-- [ ] Registrar o `TenantMiddleware` após o `AuthenticationMiddleware` no `settings.py`
-- [ ] Implementar `TenantRequiredMixin` compondo `LoginRequiredMixin`
-- [ ] Implementar `RolePermissionMixin` com o escopo de visibilidade por papel
-- [ ] Implementar a validação de integridade cross-tenant no `clean()` dos models de domínio
-- [ ] Registrar `Tenant` e `Plan` no admin com filtros e busca
-- [ ] Documentar a arquitetura multi-tenant em `docs/arquitetura/` com diagrama Mermaid
+- [x] Criar o app `core` como app principal registrado em `INSTALLED_APPS`
+- [x] Modelar `Plan` com `is_enabled` (habilitado apenas no Free)
+- [x] Modelar `Tenant` com Razão Social e CNPJ obrigatórios e validados
+- [x] Criar a migração inicial e o data migration que popula os planos Free, Pro e Business
+- [x] Implementar o `ContextVar` de tenant corrente em `base/context.py`
+- [x] Implementar `TenantQuerySet` e `TenantManager` com filtro automático por tenant
+- [x] Implementar o model abstrato `TenantAwareModel` com FK `tenant` e auditoria
+- [x] Implementar `TenantMiddleware` resolvendo o tenant a partir do usuário autenticado
+- [x] Registrar o `TenantMiddleware` após o `AuthenticationMiddleware` no `settings.py`
+- [x] Implementar `TenantRequiredMixin` compondo `LoginRequiredMixin`
+- [x] Implementar `RolePermissionMixin` com o escopo de visibilidade por papel
+- [x] Implementar a validação de integridade cross-tenant no `clean()` dos models de domínio
+- [x] Registrar `Tenant` e `Plan` no admin com filtros e busca
+- [x] Documentar a arquitetura multi-tenant em `docs/arquitetura/` com diagrama Mermaid
+
+> **Nota de implementação (2026-08-17).** Duas peças ficam inertes até as sprints que
+> lhes dão substrato, por dependência e não por pendência:
+>
+> - O `TenantMiddleware` só desloga usuário sem corretora quando o model `User` tiver o
+>   campo `tenant` (Sprint 2). Até lá ele checa a existência do campo e não interfere no
+>   login do admin — do contrário, deslogaria qualquer usuário do `auth.User` padrão.
+> - O `RolePermissionMixin` depende de `user.role` (Sprint 2) e dos perfis
+>   `agent_profile` / `producer_profile` (Sprint 6).
+>
+> O `Role` (`OWNER`/`AGENT`/`PRODUCER`) foi declarado em `base/constants.py`, e não em
+> `accounts`, porque tanto o model `User` quanto o mixin de permissão dependem dele.
+> `Tenant` e `Plan` **não** herdam de `TenantAwareModel`: `Plan` é catálogo global e
+> `Tenant` é a própria raiz do isolamento.
 
 ### Sprint 2 — Autenticação e usuários
 

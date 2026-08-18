@@ -59,6 +59,53 @@ graph TD
 - Índices compostos `(tenant_id, <campo>)` em todos os campos usados em filtros e ordenações.
 - Unicidade sempre escopada: `UniqueConstraint(fields=['tenant', 'document'])`.
 
+## Onde cada camada mora
+
+| Camada | Arquivo | Símbolo |
+| --- | --- | --- |
+| ContextVar | `base/context.py` | `get_current_tenant`, `tenant_context` |
+| Manager | `base/managers.py` | `TenantQuerySet`, `TenantManager` |
+| Model abstrato | `base/models.py` | `TenantAwareModel` |
+| Middleware | `base/middleware.py` | `TenantMiddleware` |
+| Mixins | `base/mixins.py` | `TenantRequiredMixin`, `RolePermissionMixin` |
+| Papéis | `base/constants.py` | `Role` |
+| Raiz do tenant | `core/models.py` | `Tenant`, `Plan` |
+
+## O manager falha fechado
+
+Sem tenant em contexto, `objects` devolve **queryset vazio** — não a tabela inteira.
+É a escolha deliberada: um middleware esquecido ou uma query fora de request retorna
+nada, nunca dados de outra corretora.
+
+```python
+Policy.objects.count()          # 0 fora de request
+with tenant_context(alpha):
+    Policy.objects.count()      # apenas as da Alpha
+Policy.all_tenants.count()      # todas, uso restrito
+```
+
+`Meta.base_manager_name = 'all_tenants'` aponta os internos do Django (descritores de
+relação, `refresh_from_db`) para o manager irrestrito, para que o framework não tropece
+no filtro. O `_default_manager` — usado por views, forms e admin — continua sendo o
+filtrado.
+
+## Validação cross-tenant
+
+`TenantAwareModel.clean()` percorre as FKs que apontam para outros models tenant-aware
+e recusa qualquer uma cujo tenant divirja:
+
+```
+Claim(tenant=alpha, policy=<apólice da Beta>).full_clean()
+→ ValidationError: {'policy': ['Este registro pertence a outra corretora.']}
+```
+
 ## Estado da implementação
 
-Sprint 0 entregou apenas `TimeStampedModel`. As demais camadas (`Tenant`, `TenantAwareModel`, `TenantManager`, `TenantMiddleware`, mixins) são a Sprint 1.
+Sprint 1 entregou as cinco camadas, o `Tenant`, o `Plan` e o admin dos dois. O
+`TenantMiddleware` só passa a deslogar usuário sem corretora quando o model `User`
+ganhar o campo `tenant`, na Sprint 2 — até lá ele resolve tenant nenhum e não
+interfere no login do admin.
+
+O `RolePermissionMixin` depende de `user.role` e dos perfis `agent_profile` /
+`producer_profile`, que chegam nas Sprints 2 e 6. Enquanto não existirem, o mixin
+está escrito mas não tem model de domínio onde ser aplicado.
