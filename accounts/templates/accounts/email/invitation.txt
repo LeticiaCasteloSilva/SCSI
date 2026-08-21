@@ -1,0 +1,14 @@
+Olá,
+
+Você foi convidada(o) para acessar a {{ tenant }} no SCSI como {{ role_display }}.
+
+Para criar sua senha e ativar o acesso, abra o link abaixo:
+
+{{ accept_url }}
+
+O convite expira em {{ invitation.expires_at|date:"d/m/Y \à\s H:i" }}.
+
+Se você não esperava este convite, basta ignorar esta mensagem.
+
+--
+SCSI — Sistema de Gestão para Corretora de Seguros Inteligente

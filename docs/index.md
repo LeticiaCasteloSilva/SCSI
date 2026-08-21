@@ -6,7 +6,7 @@ A especificação completa do produto está no [`PRD.md`](https://github.com/Let
 
 ## Estado atual
 
-Sprints 0 e 1 — fundação do ambiente local e núcleo multi-tenant.
+Sprints 0 a 2 — fundação do ambiente, núcleo multi-tenant e autenticação.
 
 | Componente | Estado |
 | --- | --- |
@@ -18,8 +18,10 @@ Sprints 0 e 1 — fundação do ambiente local e núcleo multi-tenant.
 | Endpoint `GET /health/` | Pronto |
 | Commands `wait_for_db` e `check_services` | Pronto |
 | Núcleo multi-tenant (`Tenant`, `Plan`, managers, middleware, mixins) | Pronto |
+| Autenticação por e-mail, papéis, convites e recuperação de senha | Pronto |
 
 ## Por onde começar
 
 - [Ambiente local](setup/ambiente-local.md) — instalação dos serviços e execução do projeto
 - [Arquitetura multi-tenant](arquitetura/multi-tenant.md) — como o isolamento entre corretoras funciona
+- [accounts](apps/accounts.md) — login por e-mail, papéis e convites

@@ -1031,7 +1031,6 @@ Cada app segue o layout padrão: `models.py`, `managers.py` (quando necessário)
 | Tasks Celery | Em `tasks.py` do app, idempotentes, recebendo IDs (nunca instâncias) |
 | Simplicidade | Preferir código legível a abstração excessiva |
 | Migrações | Uma migração por mudança lógica, com nome descritivo |
-| Testes | **Não implementar testes automatizados nesta fase** |
 | Commits | Conventional Commits, em inglês |
 
 ---
@@ -1105,17 +1104,6 @@ As sprints estão em ordem lógica de dependência: fundação → autenticaçã
 - [x] Criar o `README.md` inicial com o passo a passo do setup local nativo
 - [x] Fazer o primeiro commit e o push para o GitHub
 
-> **Nota de ambiente (2026-08-13).** Este ambiente roda macOS 12.7.6, que o Homebrew não
-> suporta mais (sem bottles; toda fórmula compila do source). Conforme §13.1, PostgreSQL 16
-> e Redis 7.4 foram instalados nativamente — Postgres.app e build do source,
-> respectivamente.
-
-> **Nota de decisão (2026-08-16).** O RabbitMQ foi **removido do escopo do projeto**. O
-> Redis passa a ser o broker único do Celery, acumulando os papéis de broker, result
-> backend e cache da aplicação, em databases distintos para evitar colisão de dados:
-> `0` broker, `1` result backend, `2` cache. As duas tarefas antes bloqueadas pelo
-> RabbitMQ foram concluídas com essa configuração.
-
 ### Sprint 1 — Núcleo multi-tenant
 
 - [x] Criar o app `core` como app principal registrado em `INSTALLED_APPS`
@@ -1133,36 +1121,24 @@ As sprints estão em ordem lógica de dependência: fundação → autenticaçã
 - [x] Registrar `Tenant` e `Plan` no admin com filtros e busca
 - [x] Documentar a arquitetura multi-tenant em `docs/arquitetura/` com diagrama Mermaid
 
-> **Nota de implementação (2026-08-17).** Duas peças ficam inertes até as sprints que
-> lhes dão substrato, por dependência e não por pendência:
->
-> - O `TenantMiddleware` só desloga usuário sem corretora quando o model `User` tiver o
->   campo `tenant` (Sprint 2). Até lá ele checa a existência do campo e não interfere no
->   login do admin — do contrário, deslogaria qualquer usuário do `auth.User` padrão.
-> - O `RolePermissionMixin` depende de `user.role` (Sprint 2) e dos perfis
->   `agent_profile` / `producer_profile` (Sprint 6).
->
-> O `Role` (`OWNER`/`AGENT`/`PRODUCER`) foi declarado em `base/constants.py`, e não em
-> `accounts`, porque tanto o model `User` quanto o mixin de permissão dependem dele.
-> `Tenant` e `Plan` **não** herdam de `TenantAwareModel`: `Plan` é catálogo global e
-> `Tenant` é a própria raiz do isolamento.
 
 ### Sprint 2 — Autenticação e usuários
 
-- [ ] Criar o app `accounts` na raiz
-- [ ] Implementar o model `User` com `USERNAME_FIELD = 'email'` e sem campo `username`
-- [ ] Implementar o `UserManager` com `create_user` e `create_superuser` por e-mail
-- [ ] Adicionar os papéis `OWNER`, `AGENT` e `PRODUCER` como choices em `role`
-- [ ] Configurar `AUTH_USER_MODEL` no `settings.py` e gerar a migração
-- [ ] Configurar o backend de e-mail nativo com as credenciais lidas do `.env`
-- [ ] Implementar a tela de login por e-mail com `LoginView` e template do design system
-- [ ] Implementar o logout com `LogoutView`
-- [ ] Implementar a recuperação de senha com as views nativas e templates de e-mail em português
-- [ ] Implementar o model `Invitation` com token e expiração
-- [ ] Implementar o CRUD de usuários do tenant restrito ao papel `OWNER`
-- [ ] Implementar o envio de convite por e-mail e a tela de aceite com definição de senha
-- [ ] Registrar `User` e `Invitation` no admin com filtros por papel e status
-- [ ] Documentar o fluxo de autenticação em `docs/apps/accounts.md`
+- [x] Criar o app `accounts` na raiz
+- [x] Implementar o model `User` com `USERNAME_FIELD = 'email'` e sem campo `username`
+- [x] Implementar o `UserManager` com `create_user` e `create_superuser` por e-mail
+- [x] Adicionar os papéis `OWNER`, `AGENT` e `PRODUCER` como choices em `role`
+- [x] Configurar `AUTH_USER_MODEL` no `settings.py` e gerar a migração
+- [x] Configurar o backend de e-mail nativo com as credenciais lidas do `.env`
+- [x] Implementar a tela de login por e-mail com `LoginView` e template do design system
+- [x] Implementar o logout com `LogoutView`
+- [x] Implementar a recuperação de senha com as views nativas e templates de e-mail em português
+- [x] Implementar o model `Invitation` com token e expiração
+- [x] Implementar o CRUD de usuários do tenant restrito ao papel `OWNER`
+- [x] Implementar o envio de convite por e-mail e a tela de aceite com definição de senha
+- [x] Registrar `User` e `Invitation` no admin com filtros por papel e status
+- [x] Documentar o fluxo de autenticação em `docs/apps/accounts.md`
+
 
 ### Sprint 3 — Layout base e design system
 

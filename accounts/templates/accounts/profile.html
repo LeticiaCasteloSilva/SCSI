@@ -1,0 +1,14 @@
+{% extends 'base/layouts/auth.html' %}
+{% block title %}Meu perfil — SCSI{% endblock %}
+{% block content %}
+  <h1>{{ profile_user.full_name }}</h1>
+  <p class="subtitle">{{ profile_user.email }}</p>
+  <p class="subtitle">
+    Corretora: <strong>{{ profile_user.tenant|default:'—' }}</strong><br>
+    Papel: <strong>{{ profile_user.get_role_display|default:'Superusuário' }}</strong>
+  </p>
+  {% if profile_user.is_owner %}
+    <p class="links"><a href="{% url 'accounts:user_list' %}">Gerenciar usuários</a></p>
+  {% endif %}
+  <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">Sair</button></form>
+{% endblock %}

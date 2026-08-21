@@ -56,6 +56,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'core',
     'base',
+    'accounts',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -111,6 +112,17 @@ CACHES = {
         'LOCATION': env('REDIS_CACHE_URL'),
     },
 }
+
+# Authentication
+# Login is by e-mail: the custom user model has no `username` field.
+
+AUTH_USER_MODEL = 'accounts.User'
+
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'accounts:profile'
+LOGOUT_REDIRECT_URL = 'accounts:login'
+
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3
 
 # Password validation
 

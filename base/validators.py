@@ -44,3 +44,18 @@ def format_cnpj(value):
     if len(digits) != CNPJ_DIGITS:
         return value
     return f'{digits[:2]}.{digits[2:5]}.{digits[5:8]}/{digits[8:12]}-{digits[12:]}'
+
+
+def build_cnpj(base_digits):
+    """Complete a 12-digit base into a valid, masked CNPJ.
+
+    Used by `check_tenant_isolation` to mint documents that pass validation
+    without colliding with data already in the database.
+    """
+    base = strip_non_digits(base_digits)
+    if len(base) != 12:
+        raise ValueError('A base do CNPJ deve ter 12 dígitos.')
+
+    first = _check_digit(base, CNPJ_FIRST_WEIGHTS)
+    second = _check_digit(f'{base}{first}', CNPJ_SECOND_WEIGHTS)
+    return format_cnpj(f'{base}{first}{second}')

@@ -148,10 +148,8 @@ mkdocs serve -a 127.0.0.1:8001
 
 ## Convenções
 
-- PEP 8, aspas simples em Python
 - Código-fonte em inglês, interface em português brasileiro
 - Class Based Views e recursos nativos do Django
 - Todo model tem `created_at` e `updated_at`; toda entidade de domínio tem `tenant`
 - Signals exclusivamente em `signals.py` de cada app
 - Arquivos de media nunca são servidos por URL pública
-- Este projeto não usa testes automatizados (decisão explícita — `PRD.md` §2.2)

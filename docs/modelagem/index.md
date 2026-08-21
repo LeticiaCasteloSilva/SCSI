@@ -17,6 +17,8 @@ A Sprint 1 acrescentou o abstrato `base.models.TenantAwareModel`, que herda esse
 | --- | --- | --- |
 | `Plan` | `core` | Catálogo de planos; só o Free tem `is_enabled=True` |
 | `Tenant` | `core` | A corretora — raiz do isolamento, com Razão Social e CNPJ validado |
+| `User` | `accounts` | Usuário com login por e-mail, papel e FK para a corretora |
+| `Invitation` | `accounts` | Convite com token, validade e controle de aceite |
 
 Nenhum dos dois é tenant-aware: `Plan` é catálogo global e `Tenant` é a própria raiz.
 

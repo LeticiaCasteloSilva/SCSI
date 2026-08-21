@@ -1,0 +1,18 @@
+{% extends 'base/layouts/auth.html' %}
+{% block title %}Entrar — SCSI{% endblock %}
+{% block content %}
+  <h1>Entrar</h1>
+  <p class="subtitle">Acesse a sua corretora.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<ul class="errorlist">{% for e in form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    <label for="{{ form.username.id_for_label }}">E-mail</label>
+    {{ form.username }}
+    {% if form.username.errors %}<ul class="errorlist">{% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    <label for="{{ form.password.id_for_label }}">Senha</label>
+    {{ form.password }}
+    {% if form.password.errors %}<ul class="errorlist">{% for e in form.password.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    <button type="submit">Entrar</button>
+  </form>
+  <p class="links"><a href="{% url 'accounts:password_reset' %}">Esqueci minha senha</a></p>
+{% endblock %}

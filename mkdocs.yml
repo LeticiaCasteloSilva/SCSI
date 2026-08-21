@@ -46,6 +46,8 @@ nav:
   - Arquitetura:
       - Multi-tenant: arquitetura/multi-tenant.md
   - Modelagem: modelagem/index.md
-  - Apps: apps/index.md
+  - Apps:
+      - Visão geral: apps/index.md
+      - accounts: apps/accounts.md
   - IA: ia/index.md
   - Design System: design-system/index.md

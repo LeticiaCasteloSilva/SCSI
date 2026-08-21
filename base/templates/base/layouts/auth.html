@@ -1,0 +1,79 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}SCSI{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  {# Sprint 3 substitui este bloco pelo bundle do design system. Os valores
+     abaixo sao os tokens reais de design_system/css/index-CuopC2LA.css. #}
+  <style>
+    :root {
+      --background: 0 0% 100%; --foreground: 0 0% 9%;
+      --card: 0 0% 98%; --card-foreground: 0 0% 9%;
+      --primary: 0 0% 9%; --primary-foreground: 0 0% 98%;
+      --muted: 0 0% 96%; --muted-foreground: 0 0% 45%;
+      --destructive: 0 84% 60%; --destructive-foreground: 0 0% 98%;
+      --border: 0 0% 90%; --ring: 0 0% 80%;
+      --radius: .5rem;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --background: 0 0% 9%; --foreground: 0 0% 98%;
+        --card: 0 0% 11%; --card-foreground: 0 0% 98%;
+        --primary: 0 0% 98%; --primary-foreground: 0 0% 9%;
+        --muted: 0 0% 13%; --muted-foreground: 0 0% 65%;
+        --destructive: 0 63% 31%;
+        --border: 0 0% 20%; --ring: 0 0% 20%;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; padding: 1.5rem;
+      font-family: Inter, system-ui, sans-serif;
+      background: hsl(var(--background)); color: hsl(var(--foreground));
+    }
+    .card {
+      width: 100%; max-width: 26rem; padding: 2rem;
+      background: hsl(var(--card)); color: hsl(var(--card-foreground));
+      border: 1px solid hsl(var(--border)); border-radius: var(--radius);
+    }
+    h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 .25rem; }
+    .subtitle { color: hsl(var(--muted-foreground)); font-size: .875rem; margin: 0 0 1.5rem; }
+    label { display: block; font-size: .875rem; font-weight: 500; margin-bottom: .375rem; }
+    input[type=text], input[type=email], input[type=password], select {
+      width: 100%; padding: .5rem .75rem; margin-bottom: 1rem; font: inherit; font-size: .875rem;
+      background: hsl(var(--background)); color: hsl(var(--foreground));
+      border: 1px solid hsl(var(--border)); border-radius: calc(var(--radius) - 2px);
+    }
+    input:focus, select:focus { outline: 2px solid hsl(var(--ring)); outline-offset: 1px; }
+    button {
+      width: 100%; padding: .5rem 1rem; font: inherit; font-size: .875rem; font-weight: 500;
+      cursor: pointer; border: none; border-radius: calc(var(--radius) - 2px);
+      background: hsl(var(--primary)); color: hsl(var(--primary-foreground));
+    }
+    .links { margin-top: 1.25rem; font-size: .875rem; text-align: center; }
+    a { color: hsl(var(--foreground)); }
+    .errorlist, .error {
+      list-style: none; padding: 0; margin: 0 0 1rem;
+      color: hsl(var(--destructive)); font-size: .875rem;
+    }
+    .messages { list-style: none; padding: 0; margin: 0 0 1rem; font-size: .875rem; }
+    .helptext { display: block; color: hsl(var(--muted-foreground)); font-size: .75rem; margin: -.75rem 0 1rem; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

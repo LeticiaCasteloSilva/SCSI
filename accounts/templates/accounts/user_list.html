@@ -1,0 +1,29 @@
+{% extends 'base/layouts/auth.html' %}
+{% block title %}Usuários — SCSI{% endblock %}
+{% block content %}
+  <h1>Usuários</h1>
+  <p class="subtitle">{{ request.tenant }}</p>
+  <ul style="list-style:none;padding:0;margin:0 0 1.5rem;font-size:.875rem">
+    {% for u in users %}
+      <li style="padding:.5rem 0;border-bottom:1px solid hsl(var(--border))">
+        <a href="{% url 'accounts:user_update' u.pk %}">{{ u.full_name }}</a>
+        — {{ u.get_role_display }}{% if not u.is_active %} (inativo){% endif %}
+      </li>
+    {% empty %}<li>Nenhum usuário cadastrado.</li>{% endfor %}
+  </ul>
+  {% if invitations %}
+    <h1 style="font-size:1rem">Convites</h1>
+    <ul style="list-style:none;padding:0;margin:0 0 1.5rem;font-size:.875rem">
+      {% for i in invitations %}
+        <li style="padding:.5rem 0;border-bottom:1px solid hsl(var(--border))">
+          {{ i.email }} — {{ i.get_role_display }} ({{ i.status_label }})
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  <p class="links">
+    <a href="{% url 'accounts:user_create' %}">Novo usuário</a> ·
+    <a href="{% url 'accounts:invitation_create' %}">Convidar</a> ·
+    <a href="{% url 'accounts:profile' %}">Meu perfil</a>
+  </p>
+{% endblock %}

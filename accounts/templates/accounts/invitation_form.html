@@ -1,0 +1,16 @@
+{% extends 'base/layouts/auth.html' %}
+{% block title %}Convidar usuário — SCSI{% endblock %}
+{% block content %}
+  <h1>Convidar usuário</h1>
+  <p class="subtitle">Enviaremos um e-mail com o link para a pessoa definir a própria senha.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    {% endfor %}
+    <button type="submit">Enviar convite</button>
+  </form>
+  <p class="links"><a href="{% url 'accounts:user_list' %}">Voltar</a></p>
+{% endblock %}

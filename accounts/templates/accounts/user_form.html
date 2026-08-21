@@ -1,0 +1,16 @@
+{% extends 'base/layouts/auth.html' %}
+{% block title %}Usuário — SCSI{% endblock %}
+{% block content %}
+  <h1>{% if form.instance.pk %}Editar usuário{% else %}Novo usuário{% endif %}</h1>
+  <p class="subtitle">Os dados abaixo valem apenas dentro da sua corretora.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    {% endfor %}
+    <button type="submit">Salvar</button>
+  </form>
+  <p class="links"><a href="{% url 'accounts:user_list' %}">Voltar</a></p>
+{% endblock %}
